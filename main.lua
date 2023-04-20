@@ -4,6 +4,7 @@ Class = require 'class'
 
 require 'Bird'
 require 'Pipe'
+require 'PipePair'
 
 -- physical screen dimensions
 WINDOW_WIDTH = 1280
@@ -26,9 +27,12 @@ local BACKGROUND_LOOPING_POINT = 413
 
 local bird = Bird()
 
-local pipes = {}
+local pipePairs = {}
 
 local spawnTimer = 0
+
+-- initialize last recorder Y value for gap 
+local lastY = -PIPE_HEIGHT + math.random(80) + 20
 
 function love.load()
     -- initialize our nearest-neighbor filter
@@ -56,7 +60,7 @@ end
 
 function love.keypressed(key)
     love.keyboard.keysPressed[key] = true
-    
+
     if key == 'escape' then
         love.event.quit()
     end
@@ -75,20 +79,25 @@ function love.update(dt)
     backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
     groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
 
-    -- pipes spawner
+    -- pipePairs spawner
     spawnTimer = spawnTimer + dt
     if spawnTimer > 2 then
-        table.insert(pipes, Pipe())
+        local y = math.max(-PIPE_HEIGHT + 10, math.min(lastY + math.random(-20, 20), VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT))
+        lastY = y
+        table.insert(pipePairs, PipePair(y))
         spawnTimer = 0
     end
 
     -- bird update
     bird:update(dt)
 
-    for k, pipe in pairs(pipes) do
-        pipe:update(dt)
-        if pipe.x < -pipe.width then
-            table.remove(pipes, k)
+    for k, pair in pairs(pipePairs) do
+        pair:update(dt)
+    end
+
+    for k, pair in pairs(pipePairs) do
+        if pair.remove then
+            table.remove(pipePairs, k)
         end
     end
 
@@ -97,19 +106,19 @@ end
 
 function love.draw()
     push:start()
-    
+
     -- draw the background starting at top left (0, 0)
     love.graphics.draw(background, -backgroundScroll, 0)
-    
-    -- draw pipes
-    for k, pipe in pairs(pipes) do
-        pipe:render()
+
+    -- draw pipePairs
+    for k, pair in pairs(pipePairs) do
+        pair:render()
     end
 
     -- draw the ground on top of the background, toward the bottom of the screen
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
 
     bird:render()
-    
+
     push:finish()
 end
