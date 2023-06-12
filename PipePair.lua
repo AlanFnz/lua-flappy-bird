@@ -1,4 +1,4 @@
-PipePair = Class{}
+PipePair = Class {}
 
 -- size of the gap between pipes
 local GAP_HEIGHT = 120
@@ -18,6 +18,9 @@ function PipePair:init(y)
 
     -- whether this pipe pair is ready to be removed from the scene
     self.remove = false
+
+    -- whether or not this pair of pipes has been scored
+    self.scored = false
 end
 
 function PipePair:update(dt)

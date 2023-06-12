@@ -18,6 +18,7 @@ VIRTUAL_HEIGHT = 288
 require 'StateMachine'
 require 'states/BaseState'
 require 'states/PlayState'
+require 'states/ScoreState'
 require 'states/TitleScreenState'
 
 local BACKGROUND_SCROLL_SPEED = 30
@@ -65,6 +66,9 @@ function love.load()
         end,
         ['play'] = function()
             return PlayState()
+        end,
+        ['score'] = function()
+            return ScoreState()
         end
     }
     gStateMachine:change('title')
@@ -114,5 +118,5 @@ function love.draw()
     gStateMachine:render()
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
 
-    push:finish() 
+    push:finish()
 end
