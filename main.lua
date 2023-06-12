@@ -95,11 +95,19 @@ function love.load()
     -- seed 
     math.randomseed(os.time())
 
+    -- initialize keyboard input table
     love.keyboard.keysPressed = {}
+
+    -- initialize mouse input table
+    love.mouse.buttonsPressed = {}
 end
 
 function love.resize(w, h)
     push:resize(w, h)
+end
+
+function love.mousepressed(x, y, button)
+    love.mouse.buttonsPressed[button] = true
 end
 
 function love.keypressed(key)
@@ -111,11 +119,11 @@ function love.keypressed(key)
 end
 
 function love.keyboard.wasPressed(key)
-    if love.keyboard.keysPressed[key] then
-        return true
-    else
-        return false
-    end
+    return love.keyboard.keysPressed[key]
+end
+
+function love.mouse.wasPressed(button)
+    return love.mouse.buttonsPressed[button]
 end
 
 function love.update(dt)
@@ -126,7 +134,9 @@ function love.update(dt)
     -- update the state machine
     gStateMachine:update(dt)
 
+    -- reset input tables
     love.keyboard.keysPressed = {}
+    love.mouse.buttonsPressed = {}
 end
 
 function love.draw()
